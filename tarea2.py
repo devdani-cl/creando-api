@@ -1,7 +1,10 @@
+from Pokemon import Pokemon
+from random import  randint
 from fastapi import FastAPI
+import json
 import redis
 import os
-from random import  randint
+import requests
 
 app = FastAPI()
 
@@ -31,4 +34,14 @@ def get_alumnos():
             "edad": b
         }
     ]
-# guardar la info 
+
+@app.get("usm/pokemones")
+def get_pokemon():
+    url = "https://pokeapi.co/api/v2/pokemon/?limit=151"
+    response = requests.get(url) 
+    poke_json = json.loads(response.text)
+    lista_pokemones = [Pokemon(n["name"], n["url"]) for n in poke_json["results"]]
+    for p in lista_pokemones:
+        hp = p.vidaPokemon()
+        print(f'{p.nombre}: {hp} HP')
+    
